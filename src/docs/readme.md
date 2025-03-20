@@ -144,7 +144,7 @@ than `package.rust-version` declared at the manifest of this crate) are defined.
 *   **Version 1** (Compatibility Release)  
     *   Edition: 2021
     *   MSRV: 1.60 (with migration features raising MSRV)
-    *   Supported Platforms (on stable channel):
+    *   Platforms with Dynamic Dispatching (on stable channel):
         *   x86 / x86_64
         *   AArch64  
             (Windows Arm64EC support requires `arch-arm64ec` feature with MSRV 1.78)
@@ -156,7 +156,7 @@ than `package.rust-version` declared at the manifest of this crate) are defined.
 *   **Version 2** (Compatibility Release)  
     *   Edition: 2021
     *   MSRV: 1.78
-    *   Supported Platforms (on stable channel):
+    *   Platforms with Dynamic Dispatching (on stable channel):
         *   x86 / x86_64
         *   AArch64 (including Windows Arm64EC)
         *   RISC-V
@@ -164,7 +164,7 @@ than `package.rust-version` declared at the manifest of this crate) are defined.
     *   The code is completely the same as the version 2 (as of version 3.0.0).
     *   Edition: 2024
     *   MSRV: 1.85
-    *   Supported Platforms (on stable channel):
+    *   Platforms with Dynamic Dispatching (on stable channel):
         *   x86 / x86_64
         *   AArch64 (including Windows Arm64EC)
         *   RISC-V

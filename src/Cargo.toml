@@ -15,8 +15,8 @@ categories = [
 ]
 homepage = "https://github.com/a4lg/rust-target-feature-dispatch"
 repository = "https://github.com/a4lg/rust-target-feature-dispatch"
-edition = "2021"
-rust-version = "1.78"
+edition = "2024"
+rust-version = "1.85"
 
 [lib]
 name = "target_feature_dispatch"

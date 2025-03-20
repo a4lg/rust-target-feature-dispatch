@@ -6,7 +6,7 @@
 # and we have to configure some of target-specific settings).
 
 [workspace]
-resolver = "2"
+resolver = "3"
 members = ["src"]
 # Separate testing workspace(s) here.
 exclude = [

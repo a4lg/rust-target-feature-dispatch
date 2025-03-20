@@ -1,0 +1,145 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (C) 2025 Tsukasa OI <floss_rust@irq.a4lg.com>.
+
+#
+#   How to run the Test:
+#
+#   *   `cargo make tools` or copy prebuilt tool binaries
+#   *   `cargo make test`
+#
+#   Prerequisites:
+#
+#   See `../test-utils/doc/testing.md` for full list.
+#
+#   *   UNIX-like systems / shell environment
+#       *   Unless prebuilt GNU Binutils / QEMU binaries are copied to the
+#           environment, build tools must be available so that both
+#           GNU Binutils and QEMU with specific configs can be built.
+#   *   Cargo configurations are not specifically set to something weird.
+#       Clean environment specific for CI is recommended
+#       although that this script attempts to overwrite settings as possible.
+#       At least, "build.target-dir" is okay.
+#
+#   Note: expect some warnings on configurations with unstable target features.
+#
+
+extend = [
+    { path = "../test-utils/common/makefile.toml" },
+    { path = "../test-utils/common/test-run.toml" },
+]
+
+[config]
+default_to_workspace = false
+
+[env]
+CRATE_TEST_RUN = "test-run-unstable"
+
+[tasks.test-expand]
+command = "cargo"
+args = [
+    "test",
+    "-p", "test-expand-unstable",
+    "--tests",
+    "--no-default-features", "--features=enable",
+    "--", "--test-threads", "1",
+    # "--nocapture",
+]
+
+
+# Arm: Use predefined model to access
+# "neon"
+#   off: cortex-r5f
+#   on : cortex-a15
+# "dotprod"
+#   off: cortex-r5f
+#   on : max
+
+[tasks.test-run-arm-cfg-neon-n]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "cortex-a15", CRATE_FEATURES = "unstable", TARGET_FEATURES = "" }
+[tasks.test-run-arm-cfg-neon-y]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "cortex-a15", CRATE_FEATURES = "unstable,target-arm-neon", TARGET_FEATURES = "+neon" }
+[tasks.test-run-arm-dyn-neon-n]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "cortex-r5f", CRATE_FEATURES = "unstable,detect-features", TARGET_FEATURES = "" }
+[tasks.test-run-arm-dyn-neon-y]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "cortex-a15", CRATE_FEATURES = "unstable,detect-features,target-arm-neon", TARGET_FEATURES = "" }
+
+[tasks.test-run-arm-cfg-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "max", CRATE_FEATURES = "unstable", TARGET_FEATURES = "" }
+[tasks.test-run-arm-cfg-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "max", CRATE_FEATURES = "unstable,target-arm-dotprod", TARGET_FEATURES = "+dotprod" }
+[tasks.test-run-arm-dyn-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "cortex-r5f", CRATE_FEATURES = "unstable,detect-features", TARGET_FEATURES = "" }
+[tasks.test-run-arm-dyn-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "armv7-unknown-linux-musleabihf", CPU = "max", CRATE_FEATURES = "unstable,detect-features,target-arm-dotprod", TARGET_FEATURES = "" }
+
+
+# AArch64: Use predefined model to access
+# "neon"
+#   (always available on Rust ABI)
+# "dotprod"
+#   off: cortex-a53
+#   on : cortex-a55
+
+[tasks.test-run-aarch64-cfg-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "unstable,target-arm-neon", TARGET_FEATURES = "" }
+[tasks.test-run-aarch64-cfg-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "unstable,target-arm-dotprod", TARGET_FEATURES = "+dotprod" }
+[tasks.test-run-aarch64-dyn-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a53", CRATE_FEATURES = "unstable,detect-features,target-arm-neon", TARGET_FEATURES = "" }
+[tasks.test-run-aarch64-dyn-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "unstable,detect-features,target-arm-dotprod", TARGET_FEATURES = "" }
+
+
+# Omitted Targets:
+#   LoongArch64:  no enough QEMU models to distinguish features on runtime.
+#   MIPS (32/64): rustup does not offer any precompiled binaries.
+#   PowerPC:      no enough QEMU models and supported Rust features to
+#                 distinguish features on runtime.
+#                 Note that powerpc64le-unknown-linux-musl is compiled for
+#                 PowerPC 8 or later (which supports *all* of target features
+#                 with dynamic dispatch capability).
+#   s390x:        there's no targets with musl.
+
+
+# All Run Tests
+[tasks.test-run]
+run_task = { name = [
+    "test-run-arm-cfg-neon-n",
+    "test-run-arm-cfg-neon-y",
+    "test-run-arm-dyn-neon-n",
+    "test-run-arm-dyn-neon-y",
+    "test-run-arm-cfg-dotprod-n",
+    "test-run-arm-cfg-dotprod-y",
+    "test-run-arm-dyn-dotprod-n",
+    "test-run-arm-dyn-dotprod-y",
+    "test-run-aarch64-cfg-dotprod-n",
+    "test-run-aarch64-cfg-dotprod-y",
+    "test-run-aarch64-dyn-dotprod-n",
+    "test-run-aarch64-dyn-dotprod-y",
+], parallel = false }
+
+
+# Update expected bodies
+[tasks.update-expand]
+extend = "test-expand"
+env = { MACROTEST = "overwrite" }
+
+[tasks.update]
+dependencies = ["update-expand"]
+
+
+# Replace default test target with pre-configured tests
+[tasks.test]
+dependencies = ["test-expand", "test-run"]

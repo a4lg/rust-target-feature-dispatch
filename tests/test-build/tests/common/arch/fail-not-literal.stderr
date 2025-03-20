@@ -1,0 +1,11 @@
+error: expected unsuffixed literal, found `(`
+ --> tests/common/arch/fail-not-literal.rs:3:8
+  |
+3 |     if (()) {
+  |        ^
+
+error[E0308]: mismatched types
+ --> tests/common/arch/fail-not-literal.rs:4:10
+  |
+4 |         (1)
+  |          ^ expected `()`, found integer

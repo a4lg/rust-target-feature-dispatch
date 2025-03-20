@@ -1,0 +1,15 @@
+[toolchain]
+channel = "1.85.1"
+profile = "minimal"
+components = ["clippy", "rustfmt"]
+# Note:
+# i586-unknown-linux-musl defaults to no-SSE2 configuration while
+# i686-unknown-linux-musl defaults to SSE2.
+targets = [
+    "aarch64-unknown-linux-musl",
+    "i586-unknown-linux-musl",
+    "x86_64-unknown-linux-musl",
+    "loongarch64-unknown-linux-musl",
+    "riscv64gc-unknown-linux-musl",
+    "wasm32-wasip2",
+]

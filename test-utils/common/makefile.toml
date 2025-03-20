@@ -1,0 +1,296 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (C) 2025 Tsukasa OI <floss_rust@irq.a4lg.com>.
+
+#
+#   Common Tasks and Utilities
+#
+
+[env]
+# Version and archive hash (SHA-256 of .tar.xz archive)
+BINUTILS_VER  = '2.44'
+BINUTILS_HASH = 'ce2017e059d63e67ddb9240e9d4ec49c2893605035cd60e92ad53177f4377237'
+QEMU_VER      = '9.2.2'
+QEMU_HASH     = '752eaeeb772923a73d536b231e05bcc09c9b1f51690a41ad9973d900e4ec9fbf'
+# Derived names and URLs
+DOWNLOAD_PREFIX   = "../"  # root of the repository (relative to "tests{,-unstable}")
+BINUTILS_DIR      = "binutils-${BINUTILS_VER}"
+BINUTILS_FILENAME = "${BINUTILS_DIR}.tar.xz"
+BINUTILS_URL      = "https://ftp.gnu.org/gnu/binutils/${BINUTILS_FILENAME}"
+BINUTILS_LOCAL    = "${DOWNLOAD_PREFIX}${BINUTILS_FILENAME}"
+QEMU_DIR          = "qemu-${QEMU_VER}"
+QEMU_FILENAME     = "${QEMU_DIR}.tar.xz"
+QEMU_URL          = "https://download.qemu.org/${QEMU_FILENAME}"
+QEMU_LOCAL        = "${DOWNLOAD_PREFIX}${QEMU_FILENAME}"
+# Destination directories and paths
+CI_TOOLS_DIR  = "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/ci-tools-prefix"
+CI_BUILD_DIR  = "${CARGO_MAKE_CRATE_TARGET_DIRECTORY}/ci-tools-build"
+CI_BUILD_BIN  = "${CI_BUILD_DIR}/build"
+CI_BUILD_SRC  = "${CI_BUILD_DIR}/src"
+BINUTILS_SRC  = "${CI_BUILD_SRC}/${BINUTILS_DIR}"
+QEMU_SRC      = "${CI_BUILD_SRC}/${QEMU_DIR}"
+PATH_WITH_TOOLS = "${CI_TOOLS_DIR}/bin:${PATH}"
+PATH_ORIG       = "${PATH}"
+# Download settings
+CI_TOOLS_DOWNLOAD_ATTEMPTS = 3
+CI_TOOLS_DOWNLOAD_WAIT_MS  = 5000
+
+# Distclean all related files
+[tasks.distclean]
+script_runner = "@duckscript"
+script = '''
+if is_file ${BINUTILS_LOCAL}
+    rm ${BINUTILS_LOCAL}
+end
+if is_file ${QEMU_LOCAL}
+    rm ${QEMU_LOCAL}
+end
+exec cargo clean
+'''
+
+# Clean GNU Binutils and QEMU (installed binaries)
+[tasks.clean-tools-bin]
+script_runner = "@duckscript"
+script = '''
+if is_dir ${CI_TOOLS_DIR}
+    err = rm -r ${CI_TOOLS_DIR}
+    assert $err "Failed to remove existing test tools directory"
+end
+'''
+
+# Clean GNU Binutils and QEMU (build directory)
+[tasks.clean-tools-build]
+script_runner = "@duckscript"
+script = '''
+if is_dir ${CI_BUILD_DIR}
+    err = rm -r ${CI_BUILD_DIR}
+    assert $err "Failed to remove existing test tool building directory"
+end
+'''
+
+# Clean GNU Binutils and QEMU (CI tools)
+[tasks.clean-tools]
+dependencies = [
+    "clean-tools-bin",
+    "clean-tools-build",
+]
+
+# Download GNU Binutils
+[tasks.download-tools-binutils]
+script_runner = "@duckscript"
+script = '''
+# Break early if test tools are already installed.
+if is_file ${CI_TOOLS_DIR}/stamps-install-binutils
+    echo "Prebuilt GNU Binutils executable is existing."
+    echo "Run `clean-tools' task to rebuild."
+    exit 0
+end
+attempt = set 0
+while true
+    if not is_file ${BINUTILS_LOCAL}
+        wget -O ${BINUTILS_LOCAL} ${BINUTILS_URL}
+        attempt = calc ${attempt} + 1
+    end
+    HASH = sha256sum ${BINUTILS_LOCAL}
+    if eq ${HASH} ${BINUTILS_HASH}
+        exit 0
+    else
+        rm ${BINUTILS_LOCAL}
+        if eq ${attempt} ${CI_TOOLS_DOWNLOAD_ATTEMPTS}
+            assert_fail "Correct file (${BINUTILS_FILENAME}) could not be downloaded"
+        end
+        if greater_than ${attempt} 0
+            # Wait to retry (if local copy on invocation is corrupt, do not wait).
+            sleep ${CI_TOOLS_DOWNLOAD_WAIT_MS}
+        end
+    end
+end
+'''
+
+# Download QEMU
+[tasks.download-tools-qemu]
+script_runner = "@duckscript"
+script = '''
+# Break early if test tools are already installed.
+if is_file ${CI_TOOLS_DIR}/stamps-install-qemu
+    echo "Prebuilt QEMU executable is existing."
+    echo "Run `clean-tools' task to rebuild."
+    exit 0
+end
+attempt = set 0
+while true
+    if not is_file ${QEMU_LOCAL}
+        wget -O ${QEMU_LOCAL} ${QEMU_URL}
+        attempt = calc ${attempt} + 1
+    end
+    HASH = sha256sum ${QEMU_LOCAL}
+    if eq ${HASH} ${QEMU_HASH}
+        exit 0
+    else
+        rm ${QEMU_LOCAL}
+        if eq ${attempt} ${CI_TOOLS_DOWNLOAD_ATTEMPTS}
+            assert_fail "Correct file (${QEMU_FILENAME}) could not be downloaded"
+        end
+        if greater_than ${attempt} 0
+            # Wait to retry (if local copy on invocation is corrupt, do not wait).
+            sleep ${CI_TOOLS_DOWNLOAD_WAIT_MS}
+        end
+    end
+end
+'''
+
+# Download both GNU Binutils and QEMU
+[tasks.download-tools]
+run_task = { name = [
+    "download-tools-binutils",
+    "download-tools-qemu",
+], parallel = true }
+
+# GNU Binutils: Preparation (extract common source code)
+[tasks.build-tools-binutils-pre]
+dependencies = ["download-tools-binutils"]
+script_runner = "@duckscript"
+script = '''
+STAMP = set "${CI_BUILD_SRC}/stamps-extract-binutils"
+if is_file ${STAMP}
+    exit 0
+end
+if not is_dir ${CI_BUILD_SRC}
+    err = mkdir ${CI_BUILD_SRC}
+    assert $err "Failed to create source directory"
+end
+if not is_dir ${BINUTILS_SRC}
+    exec --fail-on-error tar -x -J -C ${CI_BUILD_SRC} -f ${BINUTILS_LOCAL}
+end
+err = touch ${STAMP}
+assert $err "Failed to create stamp"
+'''
+
+# GNU Binutils: Build (per target)
+[tasks.build-tools-binutils-target]
+private = true
+dependencies = ["build-tools-binutils-pre"]
+script_runner = "@duckscript"
+script.pre = 'set_env TRIPLE_RUST ""'
+script.main = '''
+# Derive Rust prefix from the default one (GNU) if necessary
+if eq ${TRIPLE_RUST} ""
+    TRIPLE_RUST = set ${TRIPLE}
+end
+# Break early if target GNU Binutils is already installed.
+if is_file ${CI_TOOLS_DIR}/bin/${TRIPLE_RUST}-ld
+    exit 0
+end
+BUILD_DIR = set "${CI_BUILD_BIN}/binutils-${TRIPLE_RUST}"
+NUM_CPUS = cpu_count
+if is_dir ${BUILD_DIR}
+    err = rm -r ${BUILD_DIR}
+    assert $err "Failed to remove existing GNU Binutils build directory"
+end
+err = mkdir ${BUILD_DIR}
+assert $err "Failed to create the GNU Binutils build directory"
+cd ${BUILD_DIR}
+exec --fail-on-error ${BINUTILS_SRC}/configure --prefix=${CI_TOOLS_DIR} --target=${TRIPLE} --program-prefix=${TRIPLE_RUST}- --disable-binutils --disable-gas --disable-gold --disable-gprof --disable-gprofng --enable-ld
+exec --fail-on-error make -j${NUM_CPUS}
+exec --fail-on-error make install
+'''
+
+# GNU Binutils : Build All Targets
+[tasks.build-tools-binutils-armv7-unknown-linux-musleabihf]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "armv7-unknown-linux-musleabihf" }
+[tasks.build-tools-binutils-aarch64-unknown-linux-musl]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "aarch64-unknown-linux-musl" }
+[tasks.build-tools-binutils-i586-unknown-linux-musl]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "i586-unknown-linux-musl" }
+[tasks.build-tools-binutils-x86_64-unknown-linux-musl]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "x86_64-unknown-linux-musl" }
+[tasks.build-tools-binutils-riscv64gc-unknown-linux-musl]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "riscv64-unknown-linux-musl", TRIPLE_RUST = "riscv64gc-unknown-linux-musl" }
+[tasks.build-tools-binutils-loongarch64-unknown-linux-musl]
+extend = "build-tools-binutils-target"
+private = false
+env = { TRIPLE = "loongarch64-unknown-linux-musl" }
+[tasks.build-tools-binutils]
+dependencies = [
+    "build-tools-binutils-armv7-unknown-linux-musleabihf",
+    "build-tools-binutils-aarch64-unknown-linux-musl",
+    "build-tools-binutils-i586-unknown-linux-musl",
+    "build-tools-binutils-x86_64-unknown-linux-musl",
+    "build-tools-binutils-riscv64gc-unknown-linux-musl",
+    "build-tools-binutils-loongarch64-unknown-linux-musl",
+]
+script_runner = "@duckscript"
+script.post = '''
+STAMP = set "${CI_TOOLS_DIR}/stamps-install-binutils"
+err = touch ${STAMP}
+assert $err "Failed to create stamp"
+'''
+
+# QEMU: Extract and Build
+[tasks.build-tools-qemu]
+dependencies = ["download-tools-qemu"]
+script_runner = "@duckscript"
+script.main = '''
+# Break early if test tools are already installed.
+if is_file ${CI_TOOLS_DIR}/stamps-install-qemu
+    exit 0
+end
+BUILD_DIR = set "${QEMU_SRC}"
+NUM_CPUS = cpu_count
+if not is_dir ${CI_BUILD_SRC}
+    err = mkdir ${CI_BUILD_SRC}
+    assert $err "Failed to create source directory"
+end
+if is_dir ${BUILD_DIR}
+    err = rm -r ${BUILD_DIR}
+    assert $err "Failed to remove existing QEMU source/build directory"
+end
+exec --fail-on-error tar -x -J -C ${CI_BUILD_SRC} -f ${QEMU_LOCAL}
+cd ${BUILD_DIR}
+exec --fail-on-error ./configure --prefix=${CI_TOOLS_DIR} --target-list=arm-linux-user,aarch64-linux-user,i386-linux-user,x86_64-linux-user,riscv64-linux-user,loongarch64-linux-user
+exec --fail-on-error make -j${NUM_CPUS}
+exec --fail-on-error make install
+'''
+script.post = '''
+STAMP = set "${CI_TOOLS_DIR}/stamps-install-qemu"
+err = touch ${STAMP}
+assert $err "Failed to create stamp"
+'''
+
+# Build all CI tools
+[tasks.tools]
+dependencies = [
+    "download-tools",
+    "build-tools-binutils",
+    "build-tools-qemu",
+]
+
+# Utility: Add CI tools to PATH and run custom DuckScript
+[tasks.with-tools]
+private = true
+script_runner = "@duckscript"
+script.pre = '''
+PATH = set "${PATH_WITH_TOOLS}"
+set_env PATH "${PATH}"
+'''
+script.post = '''
+PATH = set "${PATH_ORIG}"
+set_env PATH "${PATH}"
+'''
+
+# Disable default build target
+[tasks.build]
+disabled = true
+
+# Clear default test target for pre-configured tasks
+[tasks.test]
+clear = true

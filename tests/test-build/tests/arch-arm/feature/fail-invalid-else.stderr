@@ -1,0 +1,13 @@
+error: invalid feature-specific `else` clause
+  --> tests/arch-arm/feature/fail-invalid-else.rs:1:24
+   |
+1  |   pub const VALUE: i32 = target_feature_dispatch::target_feature_dispatch! {
+   |  ________________________^
+2  | |     if class("arm") {
+3  | |         if "sha2" {
+4  | |             1
+...  |
+12 | | };
+   | |_^
+   |
+   = note: this error originates in the macro `$crate::target_feature_dispatch` which comes from the expansion of the macro `target_feature_dispatch::target_feature_dispatch` (in Nightly builds, run with -Z macro-backtrace for more info)

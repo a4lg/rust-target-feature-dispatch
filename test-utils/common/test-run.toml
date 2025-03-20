@@ -1,0 +1,91 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (C) 2025 Tsukasa OI <floss_rust@irq.a4lg.com>.
+
+#
+#   Run Test Template
+#
+
+# Body (cargo invocation)
+[tasks.test-run-target-body]
+private = true
+command = "cargo"
+args = [
+    "test",
+    # "--verbose",
+    "--target", "${TRIPLE}",
+    "-p", "${CRATE_TEST_RUN}",
+    "--tests",
+    "--no-default-features", "--features=${CRATE_FEATURES}",
+    "--", "--test-threads", "1",
+    # "--nocapture",
+]
+
+# Wrapper (environment preparation)
+[tasks.test-run-target]
+extend = "with-tools"
+private = true
+script.main = '''
+# Make triple for environment variable names.
+TRIPLE_ENV = set ${TRIPLE}
+TRIPLE_ENV = uppercase ${TRIPLE_ENV}
+TRIPLE_ENV = replace ${TRIPLE_ENV} "-" "_"
+# Extract architecture of Rust triple and initialize simulator.
+SIM_TYPE = set "qemu"
+ARCH = split ${TRIPLE} "-"
+ARCH = array_get ${ARCH} 0
+if     eq ${ARCH} "i586"
+    ARCH = set "i386"
+elseif eq ${ARCH} "i686"
+    ARCH = set "i386"
+elseif eq ${ARCH} "riscv32gc"
+    ARCH = set "riscv32"
+elseif eq ${ARCH} "riscv64gc"
+    ARCH = set "riscv64"
+elseif eq ${ARCH} "armv7"
+    ARCH = set "arm"
+elseif eq ${ARCH} "wasm32"
+    SIM_TYPE = set "wasmtime"
+    WASM_SIMD         = set "n"
+    WASM_SIMD_RELAXED = set "n"
+    WASM_MULTI_VALUE  = set "n"
+    # Parse features (ignore unknown ones).
+    WASM_FEATURES = split ${CPU} ","
+    for feat in ${WASM_FEATURES}
+        if     eq ${feat} "simd128"
+            WASM_SIMD = set "y"
+        elseif eq ${feat} "relaxed-simd"
+            WASM_SIMD = set "y"
+            WASM_SIMD_RELAXED = set "y"
+        elseif eq ${feat} "multivalue"
+            WASM_MULTI_VALUE = set "y"
+        end
+    end
+end
+if     eq ${SIM_TYPE} "qemu"
+    SIM = set "qemu-${ARCH} -cpu ${CPU}"
+elseif eq ${SIM_TYPE} "wasmtime"
+    SIM = set "wasmtime -W simd=${WASM_SIMD} -W relaxed-simd=${WASM_SIMD_RELAXED} -W multi-value=${WASM_MULTI_VALUE}"
+else
+    assert_fail "Internal error (invalid simulator configuration)"
+end
+# Make target-features argument.
+TARGET_FEATURES = set "-C target-feature=+crt-static,${TARGET_FEATURES}"
+if ends_with ${TARGET_FEATURES} ","
+    TARGET_FEATURES = substring ${TARGET_FEATURES} -1
+end
+# Make crate features.
+CRATE_FEATURES = set "enable,dispatch,${CRATE_FEATURES}"
+if ends_with ${CRATE_FEATURES} ","
+    CRATE_FEATURES = substring ${CRATE_FEATURES} -1
+end
+# Prepare environment variables.
+# Note that we force overriding the settings through environment variables
+# to ignore default configuration on non-CI environments.
+if not eq ${ARCH} "wasm32"
+    set_env "CARGO_TARGET_${TRIPLE_ENV}_LINKER" "${TRIPLE}-ld"
+end
+set_env "CARGO_TARGET_${TRIPLE_ENV}_RUNNER" "${SIM}"
+set_env "RUSTFLAGS" "${TARGET_FEATURES}"
+set_env "CRATE_FEATURES" ${CRATE_FEATURES}
+cm_run_task test-run-target-body
+'''

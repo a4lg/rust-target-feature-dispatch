@@ -1,0 +1,25 @@
+[package]
+workspace = ".."
+publish = false
+name = "test-expand"
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+autotests = false
+
+[features]
+default = [] # Although non-default, "enable" is mandatory.
+enable = []
+dispatch = []
+detect-features = []
+unstable = []
+
+[dependencies]
+target-feature-dispatch = { path = "../../src" }
+
+[dev-dependencies]
+macrotest = "1.1.0"

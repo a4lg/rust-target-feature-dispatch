@@ -1,0 +1,13 @@
+error: Invalid architecture specifier: 1(2)
+ --> tests/common/arch/fail-unknown-arg-syntax-2.rs:1:24
+  |
+1 |   pub const VALUE: i32 = target_feature_dispatch::target_feature_dispatch! {
+  |  ________________________^
+2 | |     // ERROR: 1(2) is not a supported argument syntax.
+3 | |     if 1(2) {
+4 | |         (1)
+... |
+8 | | };
+  | |_^
+  |
+  = note: this error originates in the macro `$crate::target_feature_dispatch` which comes from the expansion of the macro `target_feature_dispatch::target_feature_dispatch` (in Nightly builds, run with -Z macro-backtrace for more info)

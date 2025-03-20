@@ -1,0 +1,16 @@
+# Note:
+# There are multiple workspaces for the main crate and the testing gear.
+# This is to split MSRV and various configurations between the main crate
+# and testing crates (because MSRV-aware resolver adjusts the dependencies to
+# the *lowest* MSRV in the workspace which is not an expected behavior here
+# and we have to configure some of target-specific settings).
+
+[workspace]
+resolver = "2"
+members = ["src"]
+# Separate testing workspace(s) here.
+exclude = [
+    "tests",
+    "tests-unstable",
+    "test-utils",
+]

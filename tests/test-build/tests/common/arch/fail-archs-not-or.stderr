@@ -1,0 +1,11 @@
+error: no rules expected `&&`
+ --> tests/common/arch/fail-archs-not-or.rs:3:14
+  |
+3 |     if "x86" && "x86_64" {
+  |              ^^ no rules expected this token in macro call
+  |
+note: while trying to match `{`
+ --> $TARGET_FEATURE_DISPATCH/src/lib.rs
+  |
+  |     ($(#[$($pseudo_meta: tt)+])* $(if $($arch: tt $(($arch_arg: tt))?)||+ { $($if: tt)* })else+ else { $($else: tt)* }) => {
+  |                                                                           ^

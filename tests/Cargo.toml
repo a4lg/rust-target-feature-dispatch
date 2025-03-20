@@ -1,0 +1,19 @@
+# Note:
+# There are multiple workspaces for the main crate and the testing gear.
+# This is to split MSRV and various configurations between the main crate
+# and testing crates (because MSRV-aware resolver adjusts the dependencies to
+# the *lowest* MSRV in the workspace which is not an expected behavior here
+# and we have to configure some of target-specific settings).
+
+[workspace]
+resolver = "3"
+members = ["test-build", "test-expand", "test-run"]
+
+[workspace.package]
+version = "2.0.0-rc.1"
+license = "MIT"
+authors = ["Tsukasa OI"]
+homepage = "https://github.com/a4lg/rust-target-feature-dispatch"
+repository = "https://github.com/a4lg/rust-target-feature-dispatch"
+edition = "2024"
+rust-version = "1.85"

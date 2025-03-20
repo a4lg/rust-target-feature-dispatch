@@ -1,0 +1,5 @@
+.*
+!.git?*
+/target
+/qemu-*.tar.xz
+/binutils-*.tar.xz

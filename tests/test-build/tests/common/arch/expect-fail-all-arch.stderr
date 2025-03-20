@@ -1,0 +1,5 @@
+error: OK
+ --> tests/common/arch/expect-fail-all-arch.rs:5:13
+  |
+5 |             compile_error!("OK");
+  |             ^^^^^^^^^^^^^^^^^^^^

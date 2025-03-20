@@ -1,0 +1,18 @@
+[config]
+default_to_workspace = false
+
+[tasks.update-package-info]
+command = "cargo"
+args = [
+    "run",
+    "-p", "maint-tool",
+    "--", "update-package-info",
+]
+
+[tasks.update-deps]
+command = "cargo"
+args = [
+    "run",
+    "-p", "maint-tool",
+    "--", "update-deps",
+]

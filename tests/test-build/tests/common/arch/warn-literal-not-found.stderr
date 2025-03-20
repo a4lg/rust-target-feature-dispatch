@@ -1,0 +1,42 @@
+error: unexpected `cfg` condition value: `not_found_err`
+ --> tests/common/arch/warn-literal-not-found.rs:2:24
+  |
+2 |   pub const VALUE: i32 = target_feature_dispatch::target_feature_dispatch! {
+  |  ________________________^
+3 | |     // ERROR: "not_found_err" is not a supported architecture.
+4 | |     if "not_found_err" {
+5 | |         (1)
+... |
+9 | | };
+  | |_^
+  |
+  = note: expected values for `target_arch` are: `aarch64`, `arm`, `arm64ec`, `avr`, `bpf`, `csky`, `hexagon`, `loongarch64`, `m68k`, `mips`, `mips32r6`, `mips64`, `mips64r6`, `msp430`, `nvptx64`, `powerpc`, `powerpc64`, `riscv32`, `riscv64`, `s390x`, `sparc`, `sparc64`, `wasm32`, `wasm64`, `x86`, `x86_64`, and `xtensa`
+  = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `$crate::target_feature_dispatch` crate for guidance on how handle this unexpected cfg
+  = help: the macro `$crate::target_feature_dispatch` may come from an old version of the `target_feature_dispatch` crate, try updating your dependency with `cargo update -p target_feature_dispatch`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+note: the lint level is defined here
+ --> tests/common/arch/warn-literal-not-found.rs:1:8
+  |
+1 | #[deny(unexpected_cfgs)]
+  |        ^^^^^^^^^^^^^^^
+  = note: this error originates in the macro `$crate::target_feature_dispatch` which comes from the expansion of the macro `target_feature_dispatch::target_feature_dispatch` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error: unexpected `cfg` condition value: `not_found_err`
+ --> tests/common/arch/warn-literal-not-found.rs:2:24
+  |
+2 |   pub const VALUE: i32 = target_feature_dispatch::target_feature_dispatch! {
+  |  ________________________^
+3 | |     // ERROR: "not_found_err" is not a supported architecture.
+4 | |     if "not_found_err" {
+5 | |         (1)
+... |
+9 | | };
+  | |_^
+  |
+  = note: expected values for `target_arch` are: `aarch64`, `arm`, `arm64ec`, `avr`, `bpf`, `csky`, `hexagon`, `loongarch64`, `m68k`, `mips`, `mips32r6`, `mips64`, `mips64r6`, `msp430`, `nvptx64`, `powerpc`, `powerpc64`, `riscv32`, `riscv64`, `s390x`, `sparc`, `sparc64`, `wasm32`, `wasm64`, `x86`, `x86_64`, and `xtensa`
+  = note: using a cfg inside a macro will use the cfgs from the destination crate and not the ones from the defining crate
+  = help: try referring to `$crate::target_feature_dispatch` crate for guidance on how handle this unexpected cfg
+  = help: the macro `$crate::target_feature_dispatch` may come from an old version of the `target_feature_dispatch` crate, try updating your dependency with `cargo update -p target_feature_dispatch`
+  = note: see <https://doc.rust-lang.org/nightly/rustc/check-cfg/cargo-specifics.html> for more information about checking conditional configuration
+  = note: this error originates in the macro `$crate::target_feature_dispatch` which comes from the expansion of the macro `target_feature_dispatch::target_feature_dispatch` (in Nightly builds, run with -Z macro-backtrace for more info)

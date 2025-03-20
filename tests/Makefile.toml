@@ -1,0 +1,203 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: Copyright (C) 2025 Tsukasa OI <floss_rust@irq.a4lg.com>.
+
+#
+#   How to run the Test:
+#
+#   *   `cargo make tools` or copy prebuilt tool binaries
+#   *   `cargo make test`
+#
+#   Prerequisites:
+#
+#   See `../test-utils/doc/testing.md` for full list.
+#
+#   *   UNIX-like systems / shell environment
+#       *   Unless prebuilt GNU Binutils / QEMU binaries are copied to the
+#           environment, build tools must be available so that both
+#           GNU Binutils and QEMU with specific configs can be built.
+#   *   Cargo configurations are not specifically set to something weird.
+#       Clean environment specific for CI is recommended
+#       although that this script attempts to overwrite settings as possible.
+#       At least, "build.target-dir" is okay.
+#
+
+extend = [
+    { path = "../test-utils/common/makefile.toml" },
+    { path = "../test-utils/common/test-run.toml" },
+]
+
+[config]
+default_to_workspace = false
+
+[env]
+CRATE_TEST_RUN = "test-run"
+
+[tasks.test-build]
+command = "cargo"
+args = [
+    "test",
+    "-p", "test-build",
+    "--no-default-features",
+    "--features=enable",
+    "--tests",
+    # "--", "--test-threads", "1",
+    # "--nocapture",
+]
+
+[tasks.test-expand]
+command = "cargo"
+args = [
+    "test",
+    "-p", "test-expand",
+    "--tests",
+    "--no-default-features", "--features=enable",
+    "--", "--test-threads", "1",
+    # "--nocapture",
+]
+
+
+# x86: Use CPUID diff from the base model
+# "sse2" (x86):    pentium3
+# "sse2" (x86_64): Opteron_G1
+# "avx2":          SandyBridge
+
+[tasks.test-run-x86_32-cfg-sse2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "pentium3,sse2=on", CRATE_FEATURES = "", TARGET_FEATURES = "" }
+[tasks.test-run-x86_32-cfg-sse2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "pentium3,sse2=on", CRATE_FEATURES = "target-x86-sse2", TARGET_FEATURES = "+sse2" }
+[tasks.test-run-x86_32-dyn-sse2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "pentium3", CRATE_FEATURES = "detect-features", TARGET_FEATURES = "" }
+[tasks.test-run-x86_32-dyn-sse2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "pentium3,sse2=on", CRATE_FEATURES = "detect-features,target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-cfg-sse2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "Opteron_G1,sse2=on", CRATE_FEATURES = "target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-cfg-sse2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "Opteron_G1,sse2=on", CRATE_FEATURES = "target-x86-sse2", TARGET_FEATURES = "+sse2" }
+[tasks.test-run-x86_64-dyn-sse2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "Opteron_G1", CRATE_FEATURES = "detect-features,target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-dyn-sse2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "Opteron_G1,sse2=on", CRATE_FEATURES = "detect-features,target-x86-sse2", TARGET_FEATURES = "" }
+
+[tasks.test-run-x86_32-cfg-avx2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "", TARGET_FEATURES = "" }
+[tasks.test-run-x86_32-cfg-avx2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "target-x86-avx2", TARGET_FEATURES = "+avx2" }
+[tasks.test-run-x86_32-dyn-avx2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "SandyBridge", CRATE_FEATURES = "detect-features,target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_32-dyn-avx2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "i586-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "detect-features,target-x86-avx2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-cfg-avx2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-cfg-avx2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "target-x86-avx2", TARGET_FEATURES = "+avx2" }
+[tasks.test-run-x86_64-dyn-avx2-n]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "SandyBridge", CRATE_FEATURES = "detect-features,target-x86-sse2", TARGET_FEATURES = "" }
+[tasks.test-run-x86_64-dyn-avx2-y]
+run_task = "test-run-target"
+env = { TRIPLE = "x86_64-unknown-linux-musl", CPU = "SandyBridge,avx2=on", CRATE_FEATURES = "detect-features,target-x86-avx2", TARGET_FEATURES = "" }
+
+
+# AArch64: Use predefined model to access
+# "dotprod"
+#   off: cortex-a53
+#   on : cortex-a55
+
+[tasks.test-run-aarch64-cfg-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "target-arm-neon", TARGET_FEATURES = "" }
+[tasks.test-run-aarch64-cfg-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "target-arm-dotprod", TARGET_FEATURES = "+dotprod" }
+[tasks.test-run-aarch64-dyn-dotprod-n]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a53", CRATE_FEATURES = "detect-features,target-arm-neon", TARGET_FEATURES = "" }
+[tasks.test-run-aarch64-dyn-dotprod-y]
+run_task = "test-run-target"
+env = { TRIPLE = "aarch64-unknown-linux-musl", CPU = "cortex-a55", CRATE_FEATURES = "detect-features,target-arm-dotprod", TARGET_FEATURES = "" }
+
+
+# WebAssembly:
+# Only static dispatching is performed even when the dynamic one is enabled.
+
+[tasks.test-run-wasm-cfg-simd128-n]
+run_task = "test-run-target"
+env = { TRIPLE = "wasm32-wasip2", CPU = "simd128", CRATE_FEATURES = "", TARGET_FEATURES = "" }
+[tasks.test-run-wasm-cfg-simd128-y]
+run_task = "test-run-target"
+env = { TRIPLE = "wasm32-wasip2", CPU = "simd128", CRATE_FEATURES = "target-wasm-simd128", TARGET_FEATURES = "+simd128" }
+[tasks.test-run-wasm-dyn-simd128-n]
+run_task = "test-run-target"
+env = { TRIPLE = "wasm32-wasip2", CPU = "", CRATE_FEATURES = "detect-features", TARGET_FEATURES = "" }
+[tasks.test-run-wasm-dyn-simd128-y]
+run_task = "test-run-target"
+env = { TRIPLE = "wasm32-wasip2", CPU = "simd128", CRATE_FEATURES = "detect-features", TARGET_FEATURES = "" }
+
+
+# Others
+[tasks.test-run-others]
+run_task = "test-run-target"
+env = { TRIPLE = "loongarch64-unknown-linux-musl", CPU = "la464", CRATE_FEATURES = "detect-features", TARGET_FEATURES = "" }
+
+
+# All Run Tests
+[tasks.test-run]
+run_task = { name = [
+    "test-run-x86_32-cfg-sse2-n",
+    "test-run-x86_32-cfg-sse2-y",
+    "test-run-x86_32-dyn-sse2-n",
+    "test-run-x86_32-dyn-sse2-y",
+    "test-run-x86_64-cfg-sse2-n",
+    "test-run-x86_64-cfg-sse2-y",
+    "test-run-x86_64-dyn-sse2-n",
+    "test-run-x86_64-dyn-sse2-y",
+    "test-run-x86_32-cfg-avx2-n",
+    "test-run-x86_32-cfg-avx2-y",
+    "test-run-x86_32-dyn-avx2-n",
+    "test-run-x86_32-dyn-avx2-y",
+    "test-run-x86_64-cfg-avx2-n",
+    "test-run-x86_64-cfg-avx2-y",
+    "test-run-x86_64-dyn-avx2-n",
+    "test-run-x86_64-dyn-avx2-y",
+    "test-run-aarch64-cfg-dotprod-n",
+    "test-run-aarch64-cfg-dotprod-y",
+    "test-run-aarch64-dyn-dotprod-n",
+    "test-run-aarch64-dyn-dotprod-y",
+    "test-run-wasm-cfg-simd128-n",
+    "test-run-wasm-cfg-simd128-y",
+    "test-run-wasm-dyn-simd128-n",
+    "test-run-wasm-dyn-simd128-y",
+    "test-run-others",
+], parallel = false }
+
+
+# Update expected bodies
+[tasks.update-build]
+extend = "test-build"
+env = { TRYBUILD = "overwrite" }
+
+[tasks.update-expand]
+extend = "test-expand"
+env = { MACROTEST = "overwrite" }
+
+[tasks.update]
+dependencies = ["update-build", "update-expand"]
+
+
+# Replace default test target with pre-configured tests
+[tasks.test]
+dependencies = ["test-build", "test-expand", "test-run"]

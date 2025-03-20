@@ -1,0 +1,35 @@
+[package]
+workspace = ".."
+name = "target-feature-dispatch"
+description = "Easy dispatching by target features (both static and dynamic)"
+version = "2.0.0-rc.1"
+license = "MIT"
+authors = ["Tsukasa OI"]
+keywords = ["no_std", "simd", "intrinsics", "cpu", "macros"]
+categories = [
+    "config",
+    "development-tools",
+    "hardware-support",
+    "no-std::no-alloc",
+    "rust-patterns",
+]
+homepage = "https://github.com/a4lg/rust-target-feature-dispatch"
+repository = "https://github.com/a4lg/rust-target-feature-dispatch"
+edition = "2021"
+rust-version = "1.78"
+
+[lib]
+name = "target_feature_dispatch"
+
+[features]
+default = ["arch-mips-r6", "arch-arm64ec", "stable-std-riscv"]
+maint-code = []
+maint-lints = []
+# MSRV 1.73
+arch-mips-r6 = []
+# MSRV 1.78
+arch-arm64ec = []
+# MSRV 1.78
+stable-std-riscv = []
+
+[dependencies]

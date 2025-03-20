@@ -1,0 +1,22 @@
+[package]
+workspace = ".."
+publish = false
+name = "test-build"
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+homepage.workspace = true
+repository.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+autotests = false
+
+[features]
+default = [] # Although non-default, "enable" is mandatory.
+enable = []
+
+[dependencies]
+target-feature-dispatch = { path = "../../src" }
+
+[dev-dependencies]
+trybuild = { version = "1.0.104", features = ["diff"] }

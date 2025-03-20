@@ -1,0 +1,12 @@
+error: unsupported or invalid architecture clause
+  --> tests/common/clause-arch/fail-ifpos-expr-without-enclosing.rs:2:18
+   |
+2  |       let _: i32 = target_feature_dispatch::target_feature_dispatch! {
+   |  __________________^
+3  | |         // SPECIFIC: ARCH_COMPILER_VARIANT
+4  | |         if "aarch64" || "arm" || "arm64ec" || "avr" || "bpf" || "csky" || "hexagon" || "loongarch64" || "m68k" || "mips" || "mips32r6" ||...
+...  |
+14 | |     };
+   | |_____^
+   |
+   = note: this error originates in the macro `$crate::target_feature_dispatch` which comes from the expansion of the macro `target_feature_dispatch::target_feature_dispatch` (in Nightly builds, run with -Z macro-backtrace for more info)

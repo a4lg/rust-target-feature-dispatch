@@ -3,7 +3,7 @@ fn sample() {
         #[cfg(all(all(), feature = "dispatch"))]
         {
             {
-                #[cfg(any(target_arch = "aarch64", target_arch = "arm64ec"))]
+                #[cfg(any(target_arch = "aarch64"))]
                 {
                     {
                         #[cfg(any(any(), feature = "detect-features"))]

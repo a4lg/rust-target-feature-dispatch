@@ -639,20 +639,24 @@ pub fn process_data(src: &[u8], dst: &mut [u8]) {
 }
 ```
 
-## With `OnceLock`
+## With `OnceLock` (Rust 1.70+)
 
 This is basically the same example as above but with
-[`OnceLock`](std::sync::OnceLock), you can store a function pointer
+`std::sync::OnceLock`, you can store a function pointer
 suitable for the target feature and run dynamic dispatching only once.
 
-The example below outlines how to use [`OnceLock`](std::sync::OnceLock)
+The example below outlines how to use `OnceLock`
 containing a function pointer on x86 along with this macro.
 
 You are able to use `&'static (dyn Fn(&[u8], &mut [u8]) + Sync)` instead of
 `fn(&[u8], &mut [u8])` if you prefer returning closures but it will cost
 a time per calling because of the existence of vtables.
 
-```
+Note that using `OnceLock` requires Rust 1.70+
+(on Rust prior to 1.70, you may use
+[`once_cell::sync::OnceCell`](https://docs.rs/once_cell/1.21.1/once_cell/sync/struct.OnceCell.html) instead).
+
+```ignore
 # #![allow(unused)]
 #![allow(dead_code, unsafe_code)]
 

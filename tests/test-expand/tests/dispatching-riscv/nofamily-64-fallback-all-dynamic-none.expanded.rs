@@ -6,16 +6,15 @@ fn sample() {
                 #[cfg(any(target_arch = "riscv64"))]
                 {
                     {
-                        #[cfg(any(any(), feature = "detect-features"))]
-                        {
-                            if {
-                                false || ::std_detect::detect::__is_feature_detected::zba()
-                            } {
-                                "RISC-V + Zba"
-                            } else {
-                                { #[cfg(not(all(target_feature = "zba")))] { "fallback" } }
-                            }
-                        }
+                        #[cfg(
+                            not(
+                                all(
+                                    any(any(), feature = "detect-features"),
+                                    any(any(), feature = "unstable")
+                                )
+                            )
+                        )]
+                        { { #[cfg(not(all(target_feature = "zba")))] { "fallback" } } }
                     }
                 }
             }

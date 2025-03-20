@@ -6,8 +6,14 @@ fn sample() {
                 #[cfg(any(target_arch = "riscv32", target_arch = "riscv64"))]
                 {
                     {
-                        #[cfg(not(any(any(), feature = "detect-features")))]
-                        { { #[cfg(all(target_feature = "zba"))] { "RISC-V + Zba" } } }
+                        #[cfg(
+                            not(
+                                all(
+                                    any(any(), feature = "detect-features"),
+                                    any(any(), feature = "unstable")
+                                )
+                            )
+                        )] { { #[cfg(all(target_feature = "zba"))] { "RISC-V + Zba" } } }
                     }
                 }
             }

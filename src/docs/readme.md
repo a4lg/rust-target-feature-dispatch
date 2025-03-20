@@ -75,7 +75,7 @@ fn print_optimized_env() {
 }
 ```
 
-In combination with [`OnceLock`](std::sync::OnceLock), it can be used to store
+In combination with `OnceLock` (requires Rust 1.70+), it can be used to store
 a function pointer depending on the target features to execute
 dynamic dispatching only once.
 

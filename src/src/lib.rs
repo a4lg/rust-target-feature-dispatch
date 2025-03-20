@@ -124,24 +124,10 @@ macro_rules! target_feature_dispatch {
         Architecture-specific `if`-`else` chain.
         Note that families are also parsed in @__tgtfeat_dispatch_arch_chain_2.
     */
-    // `if`: family("aarch64") → any(target_arch = "aarch64", target_arch = "arm64ec")
+    // `if`: family("aarch64") → any(target_arch = "aarch64", [target_arch = "arm64ec"])
+    // Depend on the `arch-arm64ec` feature.
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((family("aarch64")) ($($if: tt)*)) $($rest: tt)*) => {
-        {
-            #[cfg(any(target_arch = "aarch64", target_arch = "arm64ec"))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_clause (family("aarch64")) ($($opts),*)
-                    ($($else)*) ($($if)*)
-                )
-            }
-            #[cfg(not(any(target_arch = "aarch64", target_arch = "arm64ec")))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
-                    ($($else)*) $($rest)*
-                )
-            }
-        }
+        $crate::__tgtfeat_dispatch_class_helper_arm64ec!(@__tgtfeat_dispatch_arch_chain ($($opts),*) ($($else)*) ((family("aarch64")) ($($if)*)) $($rest)*)
     };
     // `if`: family("riscv") → any(target_arch = "riscv32", target_arch = "riscv64")
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((family("riscv")) ($($if: tt)*)) $($rest: tt)*) => {
@@ -181,43 +167,15 @@ macro_rules! target_feature_dispatch {
             }
         }
     };
-    // `if`: class("arm") → any(target_arch = "aarch64", target_arch = "arm64ec", target_arch = "arm")
+    // `if`: class("arm") → any(target_arch = "aarch64", [target_arch = "arm64ec"], target_arch = "arm")
+    // Depend on the `arch-arm64ec` feature.
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("arm")) ($($if: tt)*)) $($rest: tt)*) => {
-        {
-            #[cfg(any(target_arch = "aarch64", target_arch = "arm64ec", target_arch = "arm"))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_clause (class("arm")) ($($opts),*)
-                    ($($else)*) ($($if)*)
-                )
-            }
-            #[cfg(not(any(target_arch = "aarch64", target_arch = "arm64ec", target_arch = "arm")))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
-                    ($($else)*) $($rest)*
-                )
-            }
-        }
+        $crate::__tgtfeat_dispatch_class_helper_arm64ec!(@__tgtfeat_dispatch_arch_chain ($($opts),*) ($($else)*) ((class("arm")) ($($if)*)) $($rest)*)
     };
-    // `if`: class("mips") → any(target_arch = "mips", target_arch = "mips64", target_arch = "mips32r6", target_arch = "mips64r6")
+    // `if`: class("mips") → any(target_arch = "mips", target_arch = "mips64", [target_arch = "mips32r6"], [target_arch = "mips64r6"])
+    // Depend on the `arch-mips-r6` feature.
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("mips")) ($($if: tt)*)) $($rest: tt)*) => {
-        {
-            #[cfg(any(target_arch = "mips", target_arch = "mips64", target_arch = "mips32r6", target_arch = "mips64r6"))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_clause (class("mips")) ($($opts),*)
-                    ($($else)*) ($($if)*)
-                )
-            }
-            #[cfg(not(any(target_arch = "mips", target_arch = "mips64", target_arch = "mips32r6", target_arch = "mips64r6")))]
-            {
-                $crate::target_feature_dispatch!(
-                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
-                    ($($else)*) $($rest)*
-                )
-            }
-        }
+        $crate::__tgtfeat_dispatch_class_helper_mips_r6!(@__tgtfeat_dispatch_arch_chain ($($opts),*) ($($else)*) ((class("mips")) ($($if)*)) $($rest)*)
     };
     // `if`: class("mips-classic") → any(target_arch = "mips", target_arch = "mips64")
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("mips-classic")) ($($if: tt)*)) $($rest: tt)*) => {
@@ -311,14 +269,15 @@ macro_rules! target_feature_dispatch {
         Architecture-specific `if`-`else` chain: `if` (final step)
         Conversion to regular list of architectures.
     */
-    // family("aarch64") → "aarch64" || "arm64ec"
+    // family("aarch64") → "aarch64" || ["arm64ec"]
+    // Depend on the `arch-arm64ec` feature.
     (
         @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
         (($($added: tt,)*) (family("aarch64") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
     ) => {
-        $crate::target_feature_dispatch!(
+        $crate::__tgtfeat_dispatch_class_helper_arm64ec!(
             @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
-            (($($added,)* "aarch64", "arm64ec",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            (($($added,)*) (family("aarch64") $(|| $($arch2 $(($arch2_arg))?)||+)?) ($($if)*))
             $($rest)*
         )
     };
@@ -344,25 +303,27 @@ macro_rules! target_feature_dispatch {
             $($rest)*
         )
     };
-    // class("arm") → "aarch64" || "arm64ec" || "arm"
+    // class("arm") → "aarch64" || ["arm64ec"] || "arm"
+    // Depend on the `arch-arm64ec` feature.
     (
         @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
         (($($added: tt,)*) (class("arm") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
     ) => {
-        $crate::target_feature_dispatch!(
+        $crate::__tgtfeat_dispatch_class_helper_arm64ec!(
             @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
-            (($($added,)* "aarch64", "arm64ec", "arm",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            (($($added,)*) (class("arm") $(|| $($arch2 $(($arch2_arg))?)||+)?) ($($if)*))
             $($rest)*
         )
     };
-    // class("mips") → "mips" || "mips64" || "mips32r6" || "mips64r6"
+    // class("mips") → "mips" || "mips64" || ["mips32r6"] || ["mips64r6"]
+    // Depend on the `arch-mips-r6` feature.
     (
         @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
         (($($added: tt,)*) (class("mips") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
     ) => {
-        $crate::target_feature_dispatch!(
+        $crate::__tgtfeat_dispatch_class_helper_mips_r6!(
             @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
-            (($($added,)* "mips", "mips64", "mips32r6", "mips64r6",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            (($($added,)*) (class("mips") $(|| $($arch2 $(($arch2_arg))?)||+)?) ($($if)*))
             $($rest)*
         )
     };
@@ -544,23 +505,15 @@ macro_rules! target_feature_dispatch {
         )
     };
     // RISC-V (32-bit and 64-bit)
+    // Depend on the `stable-std-riscv` feature.
     (@__tgtfeat_dispatch_feat_chain_entry (family("riscv")) ($($opts: meta),*) $($rest: tt)+) => {
-        $crate::target_feature_dispatch!(
-            @__tgtfeat_dispatch_feat_chain_dispatch_dyn ($($opts),*)
-            (::std::arch::is_riscv_feature_detected) $($rest)+
-        )
+        $crate::__tgtfeat_dispatch_dispatch_helper_riscv!(($($opts),*) $($rest)+)
     };
     (@__tgtfeat_dispatch_feat_chain_entry ("riscv32") ($($opts: meta),*) $($rest: tt)+) => {
-        $crate::target_feature_dispatch!(
-            @__tgtfeat_dispatch_feat_chain_dispatch_dyn ($($opts),*)
-            (::std::arch::is_riscv_feature_detected) $($rest)+
-        )
+        $crate::__tgtfeat_dispatch_dispatch_helper_riscv!(($($opts),*) $($rest)+)
     };
     (@__tgtfeat_dispatch_feat_chain_entry ("riscv64") ($($opts: meta),*) $($rest: tt)+) => {
-        $crate::target_feature_dispatch!(
-            @__tgtfeat_dispatch_feat_chain_dispatch_dyn ($($opts),*)
-            (::std::arch::is_riscv_feature_detected) $($rest)+
-        )
+        $crate::__tgtfeat_dispatch_dispatch_helper_riscv!(($($opts),*) $($rest)+)
     };
     // x86 (32-bit and 64-bit)
     (@__tgtfeat_dispatch_feat_chain_entry (family("x86")) ($($opts: meta),*) $($rest: tt)+) => {
@@ -783,5 +736,227 @@ macro_rules! target_feature_dispatch {
     // Coercion for series of statements (STMTS → { STMTS }).
     (@__tgtfeat_dispatch_as_expr $($tt: tt)+) => {
         $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr { $($tt)+ } )
+    };
+}
+
+/// Dispatch helper for RISC-V (MSRV 1.78).
+#[cfg(feature = "stable-std-riscv")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_dispatch_helper_riscv {
+    (($($opts: meta),*) $($rest: tt)+) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_feat_chain_dispatch_dyn ($($opts),*)
+            (::std::arch::is_riscv_feature_detected) $($rest)+
+        )
+    }
+}
+
+/// Dispatch helper for RISC-V (MSRV 1.78).
+#[cfg(not(feature = "stable-std-riscv"))]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_dispatch_helper_riscv {
+    (($($opts: meta),*) $($rest: tt)+) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_feat_chain_dispatch_dyn_nightly ($($opts),*)
+            (::std::arch::is_riscv_feature_detected) $($rest)+
+        )
+    }
+}
+
+/// Architecture Grouping helper for MIPS (MSRV 1.73).
+#[cfg(feature = "arch-mips-r6")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_class_helper_mips_r6 {
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("mips")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "mips", target_arch = "mips64", target_arch = "mips32r6", target_arch = "mips64r6"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (class("mips")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "mips", target_arch = "mips64", target_arch = "mips32r6", target_arch = "mips64r6")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (class("mips") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "mips", "mips64", "mips32r6", "mips64r6",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+}
+
+/// Architecture Grouping helper for MIPS (MSRV 1.73).
+#[cfg(not(feature = "arch-mips-r6"))]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_class_helper_mips_r6 {
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("mips")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "mips", target_arch = "mips64"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (class("mips")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "mips", target_arch = "mips64")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (class("mips") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "mips", "mips64",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+}
+
+/// Architecture Grouping helper for Arm64EC (MSRV 1.78).
+#[cfg(feature = "arch-arm64ec")]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_class_helper_arm64ec {
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((family("aarch64")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "aarch64", target_arch = "arm64ec"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (family("aarch64")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "aarch64", target_arch = "arm64ec")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("arm")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "aarch64", target_arch = "arm64ec", target_arch = "arm"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (class("arm")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "aarch64", target_arch = "arm64ec", target_arch = "arm")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (family("aarch64") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "aarch64", "arm64ec",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (class("arm") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "aarch64", "arm64ec", "arm",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+}
+
+/// Architecture Grouping helper for Arm64EC (MSRV 1.78).
+#[cfg(not(feature = "arch-arm64ec"))]
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __tgtfeat_dispatch_class_helper_arm64ec {
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((family("aarch64")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "aarch64"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (family("aarch64")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "aarch64")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("arm")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "aarch64", target_arch = "arm"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (class("arm")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "aarch64", target_arch = "arm")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (family("aarch64") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "aarch64",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (class("arm") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "aarch64", "arm",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
     };
 }

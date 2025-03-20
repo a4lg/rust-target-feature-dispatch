@@ -134,7 +134,7 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "maint-tool"
-version = "2.0.0-rc.1"
+version = "3.0.0-rc.1"
 dependencies = [
  "clap",
  "target-feature-dispatch",
@@ -190,7 +190,7 @@ dependencies = [
 
 [[package]]
 name = "target-feature-dispatch"
-version = "2.0.0-rc.1"
+version = "3.0.0-rc.1"
 
 [[package]]
 name = "toml_datetime"

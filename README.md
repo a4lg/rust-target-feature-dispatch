@@ -21,7 +21,7 @@ You will need both static and dynamic dispatching.
 However, because of huge differences between static and dynamic dispatching,
 you needed to write both and that can be tedious sometimes.
 
-...Until now.  This crate provides a macro to easily write both static and
+...But not today.  This crate provides a macro to easily write both static and
 dynamic dispatch routines depending on the target architecture / features.
 
 For more details of this crate, see [crate's readme](src/README.md).

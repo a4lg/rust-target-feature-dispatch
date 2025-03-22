@@ -21,7 +21,7 @@ You will need both static and dynamic dispatching.
 However, because of huge differences between static and dynamic dispatching,
 you needed to write both and that can be tedious sometimes.
 
-...Until now.  This crate provides a macro to easily write both static and
+...But not today.  This crate provides a macro to easily write both static and
 dynamic dispatch routines depending on the target architecture / features.
 
 **The static dispatching is the default** (`no_std`-friendly and faster if the
@@ -82,6 +82,29 @@ feature detection macros cache results and they will effectively turn into
 a series of branches (and mis-prediction is less likely on the hot path).
 
 Benchmark your code to test which is better.
+
+# Prior Art: `multiversion` (and differences)
+
+The original author did not know the existence of relative similar crate
+[`multiversion`](https://github.com/calebzulawski/multiversion).
+
+However, the author would have created this crate even if he knew the existence
+of `multiversion` because of some of core differences.
+
+1.  Declarative Macro vs. Procedural Macro  
+    This crate only uses declarative macro and runs no host code when building.
+    Instead, `multiversion` has more flexible syntax for dispatching different
+    functions.
+2.  Expression Position vs. Function Declaration  
+    This crate is specialized for expression position while `multiversion` is
+    specialized for function declaration.
+3.  Existence of pre-defined feature/CPU database  
+    This crate does not have large database of target features and CPU models
+    (it still has a small database of architectures for proper dispatching).
+    While this crate does not allow matching by CPU models like in
+    `multiversion`, we can track to the latest Rust compiler automatically and
+    it's relatively easy to know which features are detected on runtime and
+    which features are detected / evaluated statically.
 
 # When is this crate *not* useful?
 

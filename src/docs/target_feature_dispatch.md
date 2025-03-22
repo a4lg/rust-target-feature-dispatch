@@ -154,7 +154,7 @@ multiple architectures but with one big caveat: using this operator
 feature detection is technically possible.
 
 To make dynamic dispatching possible and merge two (or more) similar
-architectures, consider using family specifiers explained below.
+architectures, consider using family / class specifiers explained below.
 
 ## Family / Class Specifiers
 

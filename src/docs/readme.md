@@ -184,7 +184,7 @@ than `package.rust-version` declared at the manifest of this crate) are defined.
         *   AArch64 (including Windows Arm64EC)
         *   RISC-V
 *   **Version 3** (Actively Maintained)  
-    *   The code is completely the same as the version 2 (as of version 3.0.0).
+    *   The code is almost the same as the version 2 (as of version 3.0.3 / 3.1.0).
     *   Edition: 2024
     *   MSRV: 1.85
     *   Platforms with Dynamic Dispatching (on stable channel):

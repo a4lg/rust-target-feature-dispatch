@@ -388,4 +388,45 @@ fn rust_2024() {
             A + B
         }
     };
+    // Variant 3: `const` in a clause represents a ConstBlockExpression
+    //            (Rust 2024 edition) but with empty contents.
+    const _RESULT_3: () = target_feature_dispatch! {
+        #[static]
+        if family("x86") {
+            if "avx2" {
+                const {}
+            } else {
+                const {}
+            }
+        } else {
+            const {}
+        }
+    };
+    // Variant 4: `const` in a clause represents a ConstBlockExpression
+    //            (Rust 2024 edition) but nested so that the first token
+    //            inside ConstBlockExpression is `const`.
+    const _RESULT_4: i32 = target_feature_dispatch! {
+        #[static]
+        if family("x86") {
+            if "avx2" {
+                const {
+                    const A: i32 = 7;
+                    const B: i32 = 8;
+                    A + B
+                }
+            } else {
+                const {
+                    const A: i32 = 9;
+                    const B: i32 = 10;
+                    A + B
+                }
+            }
+        } else {
+            const {
+                const A: i32 = 11;
+                const B: i32 = 12;
+                A + B
+            }
+        }
+    };
 }

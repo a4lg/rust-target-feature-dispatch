@@ -4,4 +4,4 @@ version = 3
 
 [[package]]
 name = "target-feature-dispatch"
-version = "2.0.3-alpha.0"
+version = "2.1.0"

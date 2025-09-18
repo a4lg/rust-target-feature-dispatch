@@ -169,11 +169,11 @@ dependencies = [
 
 [[package]]
 name = "target-feature-dispatch"
-version = "3.1.1-alpha.0"
+version = "3.1.1"
 
 [[package]]
 name = "test-expand-unstable"
-version = "3.1.1-alpha.0"
+version = "3.1.1"
 dependencies = [
  "macrotest",
  "target-feature-dispatch",
@@ -181,7 +181,7 @@ dependencies = [
 
 [[package]]
 name = "test-run-unstable"
-version = "3.1.1-alpha.0"
+version = "3.1.1"
 dependencies = [
  "target-feature-dispatch",
 ]

@@ -5,7 +5,7 @@ resolver = "3"
 members = ["maint-tool"]
 
 [workspace.package]
-version = "3.1.1-alpha.0"
+version = "3.1.1"
 license = "MIT"
 authors = ["Tsukasa OI"]
 homepage = "https://github.com/a4lg/rust-target-feature-dispatch"

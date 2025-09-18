@@ -805,7 +805,9 @@ macro_rules! target_feature_dispatch {
         $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr $($else)*)
     };
 
-    // Coerce tokens into an expression.
+    // Coerce tokens into an expression (Rust 2024 needs handling for ConstBlockExpression).
+    (@__tgtfeat_dispatch_as_expr const { $expr: expr } ) => { const { $expr } };
+    (@__tgtfeat_dispatch_as_expr const $($tt: tt)+) => { $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr { const $($tt)+ } ) };
     (@__tgtfeat_dispatch_as_expr $expr: expr) => { $expr };
     // If empty, substitute with the unit value.
     (@__tgtfeat_dispatch_as_expr) => { () };

@@ -352,3 +352,40 @@ fn combination_with_oncelock_3() {
     })();
     test_opt_spec(opt_spec.as_str());
 }
+
+#[test]
+fn rust_2024() {
+    // Variant 1: `const` in a clause represents
+    //            a ConstBlockExpression (Rust 2024 edition)
+    const _RESULT_1: i32 = target_feature_dispatch! {
+        #[static]
+        if family("x86") {
+            if "avx2" {
+                const { 1 }
+            } else {
+                const { 2 }
+            }
+        } else {
+            const { 3 }
+        }
+    };
+    // Variant 2: `const` is only a beginning of statements.
+    let _result2: i32 = target_feature_dispatch! {
+        #[static]
+        if family("x86") {
+            if "avx2" {
+                const A: i32 = 1;
+                const B: i32 = 2;
+                A + B
+            } else {
+                const A: i32 = 3;
+                const B: i32 = 4;
+                A + B
+            }
+        } else {
+            const A: i32 = 5;
+            const B: i32 = 6;
+            A + B
+        }
+    };
+}

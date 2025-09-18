@@ -30,7 +30,7 @@ fn arch_arm() {
 
 #[cfg(any(target_arch = "riscv32", target_arch = "riscv64"))]
 #[test]
-fn arch_arm() {
+fn arch_riscv() {
     let tests = trybuild::TestCases::new();
     tests.pass("tests/arch-riscv/*/pass-*.rs");
     tests.compile_fail("tests/arch-riscv/*/expect-fail-*.rs");

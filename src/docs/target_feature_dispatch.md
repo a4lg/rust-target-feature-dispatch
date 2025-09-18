@@ -181,8 +181,9 @@ Currently, following family / class specifiers are supported:
 [^1]: Version 1 requires the `arch-arm64ec` feature to include `arm64ec` (MSRV: 1.78).
 [^2]: Version 1 requires the `arch-mips-r6` feature to include `mips32r6` and `mips64r6` (MSRV: 1.73).
 [^3]: Unlike `mips` and `mips64` (supporting dynamic feature dispatching),
-`mips32r6` and `mips64r6` do not support dynamic feature detection (despite that
-they are the latest MIPS architectures; ISA Release 6).
+`mips32r6` and `mips64r6` do not support dynamic feature detection.
+Beware that, `mips32r6` and `mips64r6` (ISA Release 6) are binary-incompatible
+to previous ISA releases although almost completely share the features.
 
 *   Dispatching: **Maybe Dynamic**  
     Dynamic dispatching can be enabled unless explicitly disabled or

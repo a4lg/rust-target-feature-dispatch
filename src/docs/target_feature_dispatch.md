@@ -184,7 +184,7 @@ Currently, following family / class specifiers are supported:
 [^mipsr6-2]: Unlike `mips` and `mips64` (supporting dynamic feature dispatching),
 `mips32r6` and `mips64r6` do not support dynamic feature detection.
 Beware that, `mips32r6` and `mips64r6` (ISA Release 6) are binary-incompatible
-to previous ISA releases although almost completely share the features.
+to previous ISA releases although they almost completely share the features.
 [^mipsr6-3]: This class *implicitly* requires MSRV 1.73 because unlike
 `family("aarch64")`, `class("arm")` and `class("mips")`, it does not change
 its behavior by features and specifying this class denotes that

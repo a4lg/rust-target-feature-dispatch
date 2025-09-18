@@ -2,7 +2,7 @@
 workspace = ".."
 name = "target-feature-dispatch"
 description = "Easy dispatching by target features (both static and dynamic)"
-version = "2.0.2-alpha.0"
+version = "2.0.2"
 license = "MIT"
 authors = ["Tsukasa OI"]
 keywords = ["no_std", "simd", "intrinsics", "cpu", "macros"]

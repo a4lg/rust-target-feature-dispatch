@@ -10,7 +10,7 @@ resolver = "3"
 members = ["test-build", "test-expand", "test-run"]
 
 [workspace.package]
-version = "2.0.2-alpha.0"
+version = "2.0.2"
 license = "MIT"
 authors = ["Tsukasa OI"]
 homepage = "https://github.com/a4lg/rust-target-feature-dispatch"

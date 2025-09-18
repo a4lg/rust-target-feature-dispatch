@@ -196,6 +196,25 @@ macro_rules! target_feature_dispatch {
             }
         }
     };
+    // `if`: class("mipsr6") → any(target_arch = "mips32r6", target_arch = "mips64r6")
+    (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("mipsr6")) ($($if: tt)*)) $($rest: tt)*) => {
+        {
+            #[cfg(any(target_arch = "mips32r6", target_arch = "mips64r6"))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_clause (class("mipsr6")) ($($opts),*)
+                    ($($else)*) ($($if)*)
+                )
+            }
+            #[cfg(not(any(target_arch = "mips32r6", target_arch = "mips64r6")))]
+            {
+                $crate::target_feature_dispatch!(
+                    @__tgtfeat_dispatch_arch_chain ($($opts),*)
+                    ($($else)*) $($rest)*
+                )
+            }
+        }
+    };
     // `if`: class("powerpc") → any(target_arch = "powerpc", target_arch = "powerpc64")
     (@__tgtfeat_dispatch_arch_chain ($($opts: meta),*) ($($else: tt)*) ((class("powerpc")) ($($if: tt)*)) $($rest: tt)*) => {
         {
@@ -335,6 +354,17 @@ macro_rules! target_feature_dispatch {
         $crate::target_feature_dispatch!(
             @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
             (($($added,)* "mips", "mips64",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
+            $($rest)*
+        )
+    };
+    // class("mipsr6") → "mips32r6" || "mips64r6"
+    (
+        @__tgtfeat_dispatch_arch_chain_2 ($($opts: meta),*) ($($else: tt)*)
+        (($($added: tt,)*) (class("mipsr6") $(|| $($arch2: tt $(($arch2_arg: tt))?)||+)?) ($($if: tt)*)) $($rest: tt)*
+    ) => {
+        $crate::target_feature_dispatch!(
+            @__tgtfeat_dispatch_arch_chain_2 ($($opts),*) ($($else)*)
+            (($($added,)* "mips32r6", "mips64r6",) ($($($arch2$(($arch2_arg))?)||+)?) ($($if)*))
             $($rest)*
         )
     };
@@ -593,6 +623,10 @@ macro_rules! target_feature_dispatch {
     };
     // MIPS (32-bit and 64-bit) - classic variant
     (@__tgtfeat_dispatch_feat_chain_entry (class("mips-classic")) ($($opts: meta),*) $($rest: tt)+) => {
+        $crate::target_feature_dispatch!(@__tgtfeat_dispatch_feat_chain_dispatch_static ($($opts),*) $($rest)+)
+    };
+    // MIPS (32-bit and 64-bit) - ISA Release 6
+    (@__tgtfeat_dispatch_feat_chain_entry (class("mipsr6")) ($($opts: meta),*) $($rest: tt)+) => {
         $crate::target_feature_dispatch!(@__tgtfeat_dispatch_feat_chain_dispatch_static ($($opts),*) $($rest)+)
     };
     // PowerPC (32-bit and 64-bit)

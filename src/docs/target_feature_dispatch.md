@@ -166,17 +166,18 @@ static dispatching (for different reasons).
 
 Currently, following family / class specifiers are supported:
 
-| Family / Class                 | Arch 1    | Arch 2      | Arch 3     | Arch 4     | Dispatching               |
-|:------------------------------ |:--------- |:----------- |:---------- |:---------- |:------------------------- |
-| `family("aarch64")` [^arm64ec] | `aarch64` | `arm64ec`   |            |            | Maybe Dynamic             |
-| `family("riscv")`              | `riscv32` | `riscv64`   |            |            | Maybe Dynamic             |
-| `family("x86")`                | `x86`     | `x86_64`    |            |            | Maybe Dynamic             |
-| `class("arm")` [^arm64ec]      | `aarch64` | `arm64ec`   | `arm`      |            | Static Forced             |
-| `class("mips")` [^mipsr6-1]    | `mips`    | `mips64`    | `mips32r6` | `mips64r6` | Static Forced [^mipsr6-2] |
-| `class("mips-classic")`        | `mips`    | `mips64`    |            |            | Static Forced             |
-| `class("powerpc")`             | `powerpc` | `powerpc64` |            |            | Static Forced             |
-| `class("sparc")`               | `sparc`   | `sparc64`   |            |            | Static Only               |
-| `class("wasm")`                | `wasm32`  | `wasm64`    |            |            | Static Only               |
+| Family / Class                 | Arch 1     | Arch 2      | Arch 3     | Arch 4     | Dispatching               |
+|:------------------------------ |:---------- |:----------- |:---------- |:---------- |:------------------------- |
+| `family("aarch64")` [^arm64ec] | `aarch64`  | `arm64ec`   |            |            | Maybe Dynamic             |
+| `family("riscv")`              | `riscv32`  | `riscv64`   |            |            | Maybe Dynamic             |
+| `family("x86")`                | `x86`      | `x86_64`    |            |            | Maybe Dynamic             |
+| `class("arm")` [^arm64ec]      | `aarch64`  | `arm64ec`   | `arm`      |            | Static Forced             |
+| `class("mips")` [^mipsr6-1]    | `mips`     | `mips64`    | `mips32r6` | `mips64r6` | Static Forced [^mipsr6-2] |
+| `class("mips-classic")`        | `mips`     | `mips64`    |            |            | Static Forced             |
+| `class("mipsr6")` [^mipsr6-3]  | `mips32r6` | `mips64r6`  |            |            | Static Only               |
+| `class("powerpc")`             | `powerpc`  | `powerpc64` |            |            | Static Forced             |
+| `class("sparc")`               | `sparc`    | `sparc64`   |            |            | Static Only               |
+| `class("wasm")`                | `wasm32`   | `wasm64`    |            |            | Static Only               |
 
 [^arm64ec]: Version 1 requires the `arch-arm64ec` feature to include `arm64ec` (MSRV: 1.78).
 [^mipsr6-1]: Version 1 requires the `arch-mips-r6` feature to include `mips32r6` and `mips64r6` (MSRV: 1.73).
@@ -184,6 +185,10 @@ Currently, following family / class specifiers are supported:
 `mips32r6` and `mips64r6` do not support dynamic feature detection.
 Beware that, `mips32r6` and `mips64r6` (ISA Release 6) are binary-incompatible
 to previous ISA releases although almost completely share the features.
+[^mipsr6-3]: This class *implicitly* requires MSRV 1.73 because unlike
+`family("aarch64")`, `class("arm")` and `class("mips")`, it does not change
+its behavior by features and specifying this class denotes that
+we require Rust 1.73 or later.
 
 *   Dispatching: **Maybe Dynamic**  
     Dynamic dispatching can be enabled unless explicitly disabled or

@@ -22,4 +22,4 @@ unstable = []
 target-feature-dispatch = { path = "../../src" }
 
 [dev-dependencies]
-macrotest = "1.1.0"
+macrotest = "1.2.0"

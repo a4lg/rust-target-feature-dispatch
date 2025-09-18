@@ -19,4 +19,4 @@ enable = []
 target-feature-dispatch = { path = "../../src" }
 
 [dev-dependencies]
-trybuild = { version = "1.0.104", features = ["diff"] }
+trybuild = { version = "1.0.111", features = ["diff"] }

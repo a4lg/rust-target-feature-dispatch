@@ -806,7 +806,7 @@ macro_rules! target_feature_dispatch {
     };
 
     // Coerce tokens into an expression (Rust 2024 needs handling for ConstBlockExpression).
-    (@__tgtfeat_dispatch_as_expr const { $expr: expr } ) => { const { $expr } };
+    (@__tgtfeat_dispatch_as_expr const { $($tt: tt)* } ) => { $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr_2 const { $($tt)* } ) };
     (@__tgtfeat_dispatch_as_expr const $($tt: tt)+) => { $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr { const $($tt)+ } ) };
     (@__tgtfeat_dispatch_as_expr $expr: expr) => { $expr };
     // If empty, substitute with the unit value.
@@ -819,5 +819,10 @@ macro_rules! target_feature_dispatch {
     // Coercion for series of statements (STMTS → { STMTS }).
     (@__tgtfeat_dispatch_as_expr $($tt: tt)+) => {
         $crate::target_feature_dispatch!(@__tgtfeat_dispatch_as_expr { $($tt)+ } )
+    };
+    // Coerce a ConstBlockExpression into an expression.
+    (@__tgtfeat_dispatch_as_expr_2 $expr: expr) => { $expr };
+    (@__tgtfeat_dispatch_as_expr_2 $($tt: tt)*) => {
+        compile_error!(concat!("failed to parse ", stringify!($($tt)*), " as expression"));
     };
 }

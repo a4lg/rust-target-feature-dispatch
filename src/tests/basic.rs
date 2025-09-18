@@ -429,4 +429,34 @@ fn rust_2024() {
             }
         }
     };
+    const _RESULT_4_2: i32 = target_feature_dispatch! {
+        #[static]
+        if family("x86") {
+            if "avx2" {
+                const {
+                    const {
+                        const A: i32 = 7;
+                        const B: i32 = 8;
+                        A + B
+                    }
+                }
+            } else {
+                const {
+                    const {
+                        const A: i32 = 9;
+                        const B: i32 = 10;
+                        A + B
+                    }
+                }
+            }
+        } else {
+            const {
+                const {
+                    const A: i32 = 11;
+                    const B: i32 = 12;
+                    A + B
+                }
+            }
+        }
+    };
 }

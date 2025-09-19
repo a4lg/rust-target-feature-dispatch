@@ -175,7 +175,7 @@ dependencies = [
 
 [[package]]
 name = "target-feature-dispatch"
-version = "3.0.5-alpha.0"
+version = "3.0.5"
 
 [[package]]
 name = "target-triple"
@@ -194,7 +194,7 @@ dependencies = [
 
 [[package]]
 name = "test-build"
-version = "3.0.5-alpha.0"
+version = "3.0.5"
 dependencies = [
  "target-feature-dispatch",
  "trybuild",
@@ -202,7 +202,7 @@ dependencies = [
 
 [[package]]
 name = "test-expand"
-version = "3.0.5-alpha.0"
+version = "3.0.5"
 dependencies = [
  "macrotest",
  "target-feature-dispatch",
@@ -210,7 +210,7 @@ dependencies = [
 
 [[package]]
 name = "test-run"
-version = "3.0.5-alpha.0"
+version = "3.0.5"
 dependencies = [
  "target-feature-dispatch",
 ]

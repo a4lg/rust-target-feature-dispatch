@@ -182,7 +182,8 @@ than `package.rust-version` declared at the manifest of this crate) are defined.
         *   AArch64 (including Windows Arm64EC)
         *   RISC-V
 *   **Version 3** (Actively Maintained)  
-    *   The code is completely the same as the version 2 (as of version 3.0.0).
+    *   Began from the same code as version 2 but branched to support
+        Rust 2024-specific syntax.
     *   Edition: 2024
     *   MSRV: 1.85
     *   Platforms with Dynamic Dispatching (on stable channel):
